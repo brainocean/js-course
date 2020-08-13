@@ -1,9 +1,10 @@
 const SNAKE_SEGMENT_SIZE = 8;
-const LEFT = [-1, 0];
-const RIGHT = [1, 0];
-const UP = [0, -1];
-const DOWN = [0, 1];
-const SPEED = 0.01;
+const WEST = [-1, 0];
+const EAST = [1, 0];
+const NORTH = [0, -1];
+const SOUTH = [0, 1];
+const STOP = [0, 0];
+const SPEED = 0.05;
 const INIT_SNAKE = [
   [12, 12],
   [12, 11],
@@ -13,15 +14,23 @@ const INIT_SNAKE = [
 ];
 
 let snake = INIT_SNAKE;
-let snakeDirection = [DOWN, DOWN, DOWN, RIGHT, RIGHT];
+let snakeDirection = [SOUTH, SOUTH, SOUTH, EAST, EAST];
+let nextMove = EAST;
 
 const snakeColor = "lightblue";
 
 const scale = R.map((v) => v * SNAKE_SEGMENT_SIZE);
-const move = R.zipWith((coord, dir) => coord + dir * SPEED);
-const segmentDirection = (idx) => R.nth(idx);
-const moveSnake = R.addIndex(R.map)((segment, idx) =>
-  move(segment, segmentDirection(idx)(snakeDirection))
+// const move1D = (coord, dir) => coord + dir * SPEED;
+const move1D = (coord, dir) => coord + dir;
+const move = R.zipWith(move1D);
+const directions = (snake) =>
+  R.prepend(
+    nextMove,
+    R.zipWith(R.zipWith(R.subtract), R.init(snake), R.tail(snake))
+  );
+const segmentDirection = (idx, snake) => R.nth(idx)(directions(snake));
+const moveSnake = R.addIndex(R.map)((segment, idx, snake) =>
+  move(segment, segmentDirection(idx, snake))
 );
 const updateSnakeDirection = (newHeadDir) =>
   R.compose(R.init, R.prepend(newHeadDir));
@@ -53,8 +62,21 @@ function setup() {
 function draw() {
   background("black");
   if (hasMovedOneStep()) {
-    snakeDirection = updateSnakeDirection([1, 0])(snakeDirection);
+    // snake = moveSnake(snake);
+  }
+  // snake = moveSnake(snake);
+  drawSnake(snake);
+}
+
+function keyPressed() {
+  if (keyCode === UP_ARROW) {
+    nextMove = NORTH;
+  } else if (keyCode === DOWN_ARROW) {
+    nextMove = SOUTH;
+  } else if (keyCode === LEFT_ARROW) {
+    nextMove = WEST;
+  } else if (keyCode === RIGHT_ARROW) {
+    nextMove = EAST;
   }
   snake = moveSnake(snake);
-  drawSnake(snake);
 }
