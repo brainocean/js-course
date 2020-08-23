@@ -13,6 +13,13 @@ const INIT_SNAKE = [
   [10, 10],
 ];
 
+const KEY_DIR_MAP = {
+  87: NORTH,
+  83: SOUTH,
+  65: WEST,
+  68: EAST,
+};
+
 let snake = INIT_SNAKE;
 let snakeDirection = [SOUTH, SOUTH, SOUTH, EAST, EAST];
 let nextMove = EAST;
@@ -65,15 +72,7 @@ function draw() {
 }
 
 function keyPressed() {
-  if (keyCode === UP_ARROW) {
-    nextMove = NORTH;
-  } else if (keyCode === DOWN_ARROW) {
-    nextMove = SOUTH;
-  } else if (keyCode === LEFT_ARROW) {
-    nextMove = WEST;
-  } else if (keyCode === RIGHT_ARROW) {
-    nextMove = EAST;
-  }
+  nextMove = _.getOr(nextMove, keyCode, KEY_DIR_MAP);
   snake = moveSnake(snake);
 
   return false;
