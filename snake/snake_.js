@@ -19,18 +19,17 @@ let nextMove = EAST;
 
 const snakeColor = "lightblue";
 
-const scale = R.map(R.multiply(SNAKE_SEGMENT_SIZE));
-const coordAdd = R.zipWith(R.add);
-const coordSubtract = R.zipWith(R.subtract);
-// const getSegmentDir = (idx) =>
+const scale = _.map(_.multiply(SNAKE_SEGMENT_SIZE));
+const coordAdd = _.zipWith(_.add);
+const coordSubtract = _.zipWith(_.subtract);
+
 const directions = (snake) =>
-  R.prepend(nextMove, R.zipWith(coordSubtract, R.init(snake), R.tail(snake)));
-const segmentDirection = (idx, snake) => R.nth(idx)(directions(snake));
-const moveSnake = R.addIndex(R.map)((segment, idx, snake) =>
-  coordAdd(segment, segmentDirection(idx, snake))
-);
-const updateSnakeDirection = (newHeadDir) =>
-  R.compose(R.init, R.prepend(newHeadDir));
+  _.concat(
+    [nextMove],
+    _.zipWith(coordSubtract, _.initial(snake), _.tail(snake))
+  );
+
+const moveSnake = (snake) => _.zipWith(coordAdd, snake, directions(snake));
 
 function drawSnakeSegment(x, y) {
   rectMode(CENTER);
@@ -76,4 +75,6 @@ function keyPressed() {
     nextMove = EAST;
   }
   snake = moveSnake(snake);
+
+  return false;
 }
